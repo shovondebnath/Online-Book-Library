@@ -157,3 +157,65 @@ def register_view(request):
     form = RegistrationForm()
     return render(request, 'registration.html', {'form': form})
 
+
+def otp_verify_view(request):
+    if request.user.is_authenticated:
+        return redirect('home_view')
+
+    pending = _get_pending_registration(request)
+    if not pending:
+        messages.error(request, 'Session expired. Please register again.')
+        return redirect('register')
+
+    email = pending['email']
+
+    if request.method == 'POST':
+        if 'resend' in request.POST:
+            return _resend_otp(request, pending)
+
+        form = OTPVerificationForm(request.POST)
+        if form.is_valid():
+            entered_otp = form.cleaned_data['otp']
+
+            if _is_otp_expired(pending['otp_created_at']):
+                messages.error(request, 'Your OTP has expired. Please request a new one.')
+                return render(request, 'otp_verify.html', {'form': form, 'email': email})
+
+            if pending['otp'] != entered_otp:
+                messages.error(request, 'Invalid OTP. Please try again.')
+                return render(request, 'otp_verify.html', {'form': form, 'email': email})
+
+            if User.objects.filter(email=email).exists():
+                request.session.pop(OTP_SESSION_KEY, None)
+                request.session.pop('otp_email', None)
+                messages.error(
+                    request,
+                    'An account with this email already exists. Please log in.',
+                )
+                return redirect('login_view')
+
+            name_parts = pending['full_name'].strip().split(' ', 1)
+            first_name = name_parts[0]
+            last_name = name_parts[1] if len(name_parts) > 1 else ''
+
+            user = User.objects.create(
+                username=email,
+                email=email,
+                first_name=first_name,
+                last_name=last_name,
+                password=pending['password'],
+                is_staff=False,
+                is_superuser=False,
+            )
+
+            request.session.pop(OTP_SESSION_KEY, None)
+            request.session.pop('otp_email', None)
+
+            auth_login(request, user)
+            messages.success(request, f'Welcome to DigiShelf, {first_name}!')
+            return redirect('home_view')
+    else:
+        form = OTPVerificationForm()
+
+    return render(request, 'otp_verify.html', {'form': form, 'email': email})
+
