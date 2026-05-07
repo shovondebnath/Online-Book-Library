@@ -115,3 +115,45 @@ def check_login_email_view(request):
 
     return JsonResponse({'valid': True, 'exists': True, 'message': ''})
 
+
+def register_view(request):
+    if request.user.is_authenticated:
+        return redirect('home_view')
+
+    if request.method == 'POST':
+        form = RegistrationForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data['email']
+            full_name = form.cleaned_data['full_name']
+            raw_password = form.cleaned_data['password']
+            hashed_password = make_password(raw_password)
+
+            otp_code = generate_otp()
+            pending = _build_pending_registration(
+                email, full_name, hashed_password, otp_code
+            )
+            request.session[OTP_SESSION_KEY] = pending
+            request.session['otp_email'] = email
+
+            send_mail(
+                subject='Your DigiShelf Verification Code',
+                message=(
+                    f"Hi {full_name},\n\n"
+                    f"Your one-time verification code is: {otp_code}\n\n"
+                    f"This code expires in 10 minutes.\n\n"
+                    f"If you didn't request this, please ignore this email.\n\n"
+                    f"The DigiShelf Team"
+                ),
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[email],
+                fail_silently=False,
+            )
+
+            messages.success(request, f"A 6-digit code has been sent to {email}.")
+            return redirect('otp_verify')
+
+        return render(request, 'registration.html', {'form': form})
+
+    form = RegistrationForm()
+    return render(request, 'registration.html', {'form': form})
+
