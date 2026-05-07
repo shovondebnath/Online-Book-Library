@@ -1,0 +1,259 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/openbook.css' %}">
+{% endblock %}
+
+{% block nav_links %}
+    <a href="{% url 'home_view' %}" class="{% if request.path == '/' or request.path == '/home/' %}active{% endif %}">Home</a>
+{% endblock %}
+
+{% block content %}
+{% if book %}
+<div class="container">
+    <div class="book-image">
+        {% if book.cover_image %}
+            <img src="{{ book.cover_image.url }}" alt="{{ book.title }} book cover">
+        {% else %}
+            <img src="https://picsum.photos/seed/book{{ book.book_id }}/300/400" alt="{{ book.title }} book cover">
+        {% endif %}
+    </div>
+
+    <div class="book-content">
+        <h1>{{ book.title }}</h1>
+        <p class="author">by {{ book.author }}</p>
+
+        <div class="meta">
+            <div class="rating">⭐ {% if book.avg_rating %}{{ book.avg_rating|floatformat:1 }}{% else %}0.0{% endif %}</div>
+            <div class="readers">{{ book.rating_count|default:0 }} ratings</div>
+        </div>
+
+        <div class="buttons">
+            {% if book.book_paid %}
+                {% if can_read %}
+                    <a class="btn read-btn" href="{% url 'ebook_reader' book.book_id %}" target="_blank" rel="noopener">
+                        Read Now
+                    </a>
+                    <button
+                        class="btn library-btn"
+                        type="button"
+                        id="addToLibraryBtn"
+                        data-save-url="{% url 'my_books_add' book.book_id %}"
+                        data-is-authenticated="{% if request.user.is_authenticated %}1{% else %}0{% endif %}"
+                        data-login-url="{% url 'login_view' %}?next={{ request.get_full_path|urlencode }}">
+                        + Add to My Library
+                    </button>
+                {% else %}
+                    <button class="btn borrow-btn" type="button" id="borrowToggleBtn">
+                        Borrow
+                    </button>
+                {% endif %}
+            {% else %}
+                <a class="btn read-btn" href="{% url 'ebook_reader' book.book_id %}" target="_blank" rel="noopener">
+                    Read Now
+                </a>
+                <button
+                    class="btn library-btn"
+                    type="button"
+                    id="addToLibraryBtn"
+                    data-save-url="{% url 'my_books_add' book.book_id %}"
+                    data-is-authenticated="{% if request.user.is_authenticated %}1{% else %}0{% endif %}"
+                    data-login-url="{% url 'login_view' %}?next={{ request.get_full_path|urlencode }}">
+                    + Add to My Library
+                </button>
+            {% endif %}
+        </div>
+
+        {% if book.book_paid %}
+            {% if can_read and active_borrow %}
+                <div class="borrow-status">
+                    Access ends {{ active_borrow.expiry_date|date:"M j, Y" }}
+                </div>
+            {% elif not can_read %}
+                <div class="borrow-panel" id="borrowPanel">
+                    <h4>Choose your borrow duration</h4>
+                    {% if borrow_options %}
+                        <form method="post" action="{% url 'borrow_book' book.book_id %}" class="borrow-form">
+                            {% csrf_token %}
+                            <div class="borrow-options">
+                                {% for option in borrow_options %}
+                                    <label class="borrow-option">
+                                        <input type="radio" name="borrow_duration_days" value="{{ option.days }}" required>
+                                        <span class="borrow-days">{{ option.days }} days</span>
+                                        <span class="borrow-cost">{{ option.cost }} credits</span>
+                                    </label>
+                                {% endfor %}
+                            </div>
+                            <button type="submit" class="btn borrow-confirm-btn">Confirm Borrow</button>
+                        </form>
+                    {% else %}
+                        <p class="borrow-empty">Borrow options are not available for this book.</p>
+                    {% endif %}
+                </div>
+            {% endif %}
+        {% endif %}
+
+        <p class="genres">
+            <strong>Genres:</strong>
+            {% if genres_list %}
+                {% for genre in genres_list %}
+                    <a href="#">{{ genre }}</a>
+                {% endfor %}
+            {% else %}
+                <span>Not specified</span>
+            {% endif %}
+        </p>
+
+        <div class="rate" data-current-rating="{{ user_rating|default:0 }}">
+            Rate this book:<br>
+            {% if request.user.is_authenticated %}
+                <form method="post" action="{% url 'openbook_detail' book.book_id %}" class="rating-form-hidden" id="ratingForm">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="rate">
+                    <input type="hidden" name="rating_value" id="ratingValueInput" value="{{ user_rating|default:'' }}">
+                </form>
+                <span class="rating-star" onclick="setRating(1)" aria-label="Rate 1 star">★</span>
+                <span class="rating-star" onclick="setRating(2)" aria-label="Rate 2 stars">★</span>
+                <span class="rating-star" onclick="setRating(3)" aria-label="Rate 3 stars">★</span>
+                <span class="rating-star" onclick="setRating(4)" aria-label="Rate 4 stars">★</span>
+                <span class="rating-star" onclick="setRating(5)" aria-label="Rate 5 stars">★</span>
+            {% else %}
+                <p class="comment-login-hint">
+                    Please <a href="{% url 'login_view' %}?next={{ request.get_full_path|urlencode }}">log in</a> to rate this book.
+                </p>
+            {% endif %}
+        </div>
+
+        <div class="desc">
+            <p><strong>Description:</strong></p>
+            <br>
+            <p>{{ book.description|linebreaksbr }}</p>
+        </div>
+
+        <div class="comment-box" id="comments">
+            <h3>Write a Comment</h3>
+
+            {% if messages %}
+                <div class="comment-messages">
+                    {% for message in messages %}
+                        <p class="comment-message {{ message.tags }}">{{ message }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            {% if request.user.is_authenticated %}
+                <form method="post" action="{% url 'openbook_detail' book.book_id %}?show_comments=1">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="create">
+                    <input type="hidden" name="comments_page" value="{{ comments_page|default:1 }}">
+                    <textarea name="comment_text" id="pageCommentInput" placeholder="Share your thoughts about {{ book.title }}..." required></textarea>
+                    <div class="comment-actions">
+                        <button class="post-btn" type="submit">Post Comment</button>
+                        <button class="preview-btn" type="button" onclick="openCommentModal()">All Comments</button>
+                    </div>
+                </form>
+            {% else %}
+                <p class="comment-login-hint">
+                    Please <a href="{% url 'login_view' %}?next={{ request.get_full_path|urlencode }}">log in</a> to post a comment.
+                </p>
+                <div class="comment-actions">
+                    <a href="{% url 'login_view' %}?next={{ request.get_full_path|urlencode }}" class="preview-btn comment-login-btn">Login to Comment</a>
+                    <button class="preview-btn" type="button" onclick="openCommentModal()">All Comments</button>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="recommendations-section">
+    <h2 class="section-title">
+        RECOMMENDATIONS
+    </h2>
+
+    <div class="horizontal-scroll">
+        <div class="horizontal-row">
+            {% for recommendation in recommendations %}
+                <a href="{% url 'openbook_detail' recommendation.book_id %}" class="book-card">
+                    {% if recommendation.cover_image %}
+                        <img src="{{ recommendation.cover_image.url }}" alt="{{ recommendation.title }} cover" class="book-cover">
+                    {% else %}
+                        <img src="https://picsum.photos/seed/book{{ recommendation.book_id }}/300/400" alt="{{ recommendation.title }} cover" class="book-cover">
+                    {% endif %}
+                    <div class="book-info">
+                        <p class="book-title">{{ recommendation.title }}</p>
+                        <p class="book-author">{{ recommendation.author }}</p>
+                    </div>
+                    <p class="book-access-label {% if recommendation.book_paid %}book-access-paid{% else %}book-access-free{% endif %}">{{ recommendation.book_paid|yesno:"Paid,Free" }}</p>
+                </a>
+            {% empty %}
+                <p class="footer-note">No additional books available right now.</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<div class="modal{% if show_comments %} show{% endif %}" id="commentModal"{% if show_comments %} style="display: flex;"{% endif %}>
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Reader Comments</h2>
+            <span class="close-btn" onclick="closeCommentModal()">×</span>
+        </div>
+        <div class="modal-body">
+            {% if request.user.is_authenticated %}
+                <div class="comment-form">
+                    <form method="post" action="{% url 'openbook_detail' book.book_id %}?show_comments=1">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="create">
+                        <input type="hidden" name="comments_page" value="{{ comments_page|default:1 }}">
+                        <textarea name="comment_text" id="modalCommentInput" placeholder="Write your comment here..." required></textarea>
+                        <button type="submit">Post Comment</button>
+                    </form>
+                </div>
+            {% endif %}
+
+            <div class="comments-list" id="modalCommentsList">
+                {% for review in top_level_reviews %}
+                    {% include 'partials/review_item.html' with review=review book=book comments_page=comments_page %}
+                {% empty %}
+                    <p class="no-comments">No comments yet. Be the first to comment.</p>
+                {% endfor %}
+            </div>
+
+            {% if reviews_page_obj and reviews_page_obj.paginator.num_pages > 1 %}
+                <div class="comments-pagination">
+                    {% if reviews_page_obj.has_previous %}
+                        <a
+                            href="{% url 'openbook_detail' book.book_id %}?show_comments=1&comments_page={{ reviews_page_obj.previous_page_number }}"
+                            class="comments-page-link">
+                            Previous
+                        </a>
+                    {% endif %}
+
+                    <span class="comments-page-indicator">
+                        Page {{ reviews_page_obj.number }} of {{ reviews_page_obj.paginator.num_pages }}
+                    </span>
+
+                    {% if reviews_page_obj.has_next %}
+                        <a
+                            href="{% url 'openbook_detail' book.book_id %}?show_comments=1&comments_page={{ reviews_page_obj.next_page_number }}"
+                            class="comments-page-link">
+                            Next
+                        </a>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script src="{% static 'js/openbook.js' %}"></script>
+{% else %}
+<div class="container">
+    <div class="book-content">
+        <h1>No Books Available</h1>
+        <p class="author">Please add books from the staff panel and this page will update automatically.</p>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
