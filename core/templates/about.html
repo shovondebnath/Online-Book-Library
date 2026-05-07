@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/about.css' %}">
+{% endblock %}
+
+{% block nav_links %}
+    <a href="{% url 'home_view' %}" class="{% if request.path == '/' or request.path == '/home/' %}active{% endif %}">Home</a>
+{% endblock %}
+
+{% block content %}
+
+    <div class="main-container">
+        
+        <!-- HERO -->
+        <div class="hero">
+            <h1>We turn pages into pixels</h1>
+            <p>Building the most beautiful, accessible, and loved digital library in the world.</p>
+        </div>
+
+        <!-- OUR STORY -->
+        <div class="story">
+            <div class="story-text">
+                <h2>Our Story</h2>
+                <p>DigiShelf was founded in 2024 with one simple dream: make the world's greatest books available to everyone, instantly, beautifully, and affordably.</p>
+                <p>Frustrated by scattered e-book platforms, high prices, and clunky apps, we decided to build something different — a digital bookshelf that feels like home.</p>
+                <p>Today, hundreds of thousands of readers across the globe trust DigiShelf to discover, read, and collect books they love.</p>
+            </div>
+            <div class="story-image">
+                <img src="https://picsum.photos/id/1015/800/600" alt="DigiShelf Team working on books">
+            </div>
+        </div>
+
+        <!-- VALUES -->
+        <div class="values">
+            <h2 class="section-title">Our Values</h2>
+            <div class="values-grid">
+                <div class="value-card">
+                    <div class="value-icon">🔍</div>
+                    <h3>Curiosity First</h3>
+                    <p>We believe every book opens a new world. We make discovery effortless and delightful.</p>
+                </div>
+                <div class="value-card">
+                    <div class="value-icon">🌍</div>
+                    <h3>Knowledge for All</h3>
+                    <p>Books should never be a luxury. We work every day to make reading more accessible and inclusive.</p>
+                </div>
+                <div class="value-card">
+                    <div class="value-icon">❤️</div>
+                    <h3>Love for Reading</h3>
+                    <p>We are readers first. Every feature, every pixel, is designed with deep respect for the joy of reading.</p>
+                </div>
+                <div class="value-card">
+                    <div class="value-icon">🚀</div>
+                    <h3>Beautiful by Design</h3>
+                    <p>Technology should feel magical. We obsess over every detail so your bookshelf looks and feels stunning.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- OUR JOURNEY -->
+        <div class="journey">
+            <h2 class="section-title">Our Journey</h2>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <h4>January 2024</h4>
+                        <p><strong>Idea born</strong><br>Two book lovers frustrated with existing apps decide to build something better.</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <h4>June 2024</h4>
+                        <p><strong>First 1,000 books</strong><br>Launched private beta with 50 readers who helped shape the product.</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <h4>November 2024</h4>
+                        <p><strong>Public launch</strong><br>DigiShelf goes live. Readers from 87 countries join in the first month.</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <h4>April 2026</h4>
+                        <p><strong>Today</strong><br>Over 500,000 books read. Still the same small team obsessed with making reading better.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MEET THE TEAM -->
+        <h2 class="section-title">Meet the Dreamers Behind DigiShelf</h2>
+        <div class="team-grid">
+            <div class="team-card">
+                <img src="https://picsum.photos/id/64/600/600" alt="Founder">
+                <div class="team-info">
+                    <h3>Sarah Chen</h3>
+                    <p>Co-Founder &amp; CEO</p>
+                    <p style="font-size:14px; color:#6b7280;">Former book editor who believes technology should make stories more alive, not less.</p>
+                </div>
+            </div>
+            <div class="team-card">
+                <img src="https://picsum.photos/id/1005/600/600" alt="Founder">
+                <div class="team-info">
+                    <h3>Arjun Rahman</h3>
+                    <p>Co-Founder &amp; CTO</p>
+                    <p style="font-size:14px; color:#6b7280;">Engineer who codes with passion and reads sci-fi at 3 AM.</p>
+                </div>
+            </div>
+            <div class="team-card">
+                <img src="https://picsum.photos/id/201/600/600" alt="Designer">
+                <div class="team-info">
+                    <h3>Maya Patel</h3>
+                    <p>Head of Design</p>
+                    <p style="font-size:14px; color:#6b7280;">Obsessed with beautiful interfaces and the smell of new books.</p>
+                </div>
+            </div>
+            <div class="team-card">
+                <img src="https://picsum.photos/id/1009/600/600" alt="Content">
+                <div class="team-info">
+                    <h3>Shovon Ahmed</h3>
+                    <p>Content &amp; Community Lead</p>
+                    <p style="font-size:14px; color:#6b7280;">Book hoarder and champion of every reader’s voice.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- FINAL CTA -->
+        <div class="final-cta" style="margin-top: 100px;">
+            <h2>Join the DigiShelf family</h2>
+            <p>Whether you’re a reader, writer, student, or dreamer — there’s a place for you here.</p>
+            <a class="cta-button" href="/home/" style="text-decoration: none; color: rgb(79, 66, 66);">
+                Start Reading Today — It's Free
+            </a>
+
+        </div>
+    </div>
+    <script src="{% static 'js/about.js' %}"></script>
+{% endblock %}
