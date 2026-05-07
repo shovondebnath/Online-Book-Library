@@ -1,0 +1,186 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/book_entry.css' %}">
+{% endblock %}
+
+{% block nav_links %}
+<a href="{% url 'home_view' %}" class="{% if request.path == '/' or request.path == '/home/' %}active{% endif %}">Home</a>
+{% endblock %}
+
+{% block content %}
+<section class="book-entry-shell">
+    <div class="book-entry-card">
+        <div class="book-entry-header">
+            <div class="book-entry-header-top">
+                <div>
+                    <p class="eyebrow">Data Entry</p>
+                    <h1>Update Book</h1>
+                    <p>Search using Book ID or Title + Author, then update any book field.</p>
+                </div>
+                <a href="{% url 'book_entry' %}" class="btn-secondary">Add Book</a>
+            </div>
+        </div>
+
+        {% if messages %}
+            <div class="message-stack">
+                {% for message in messages %}
+                    <div class="message message-{{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% if search_form.non_field_errors %}
+            <div class="message message-error">
+                {{ search_form.non_field_errors }}
+            </div>
+        {% endif %}
+
+        <form method="get" class="book-search-form" novalidate>
+            <div class="form-grid three-col">
+                <div class="field-wrap">
+                    <label for="{{ search_form.book_id.id_for_label }}">Book ID</label>
+                    {{ search_form.book_id }}
+                    {{ search_form.book_id.errors }}
+                </div>
+
+                <div class="field-wrap">
+                    <label for="{{ search_form.title.id_for_label }}">Title</label>
+                    {{ search_form.title }}
+                    {{ search_form.title.errors }}
+                </div>
+
+                <div class="field-wrap">
+                    <label for="{{ search_form.author.id_for_label }}">Author</label>
+                    {{ search_form.author }}
+                    {{ search_form.author.errors }}
+                </div>
+            </div>
+
+            <div class="book-form-actions">
+                <button type="submit" class="btn-submit">Find Book</button>
+            </div>
+        </form>
+
+        {% if book and form %}
+            <hr class="section-divider">
+            <p class="editing-note">
+                Editing Book #{{ book.book_id }}: <strong>{{ book.title }}</strong> by {{ book.author }}
+            </p>
+
+            {% if form.non_field_errors %}
+                <div class="message message-error">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+
+            <form method="post" enctype="multipart/form-data" class="book-form" novalidate data-book-pricing-form>
+                {% csrf_token %}
+                <input type="hidden" name="target_book_id" value="{{ book.book_id }}">
+
+                <div class="form-grid two-col">
+                    <div class="field-wrap">
+                        <label for="{{ form.title.id_for_label }}">Title</label>
+                        {{ form.title }}
+                        {{ form.title.errors }}
+                    </div>
+
+                    <div class="field-wrap">
+                        <label for="{{ form.author.id_for_label }}">Author</label>
+                        {{ form.author }}
+                        {{ form.author.errors }}
+                    </div>
+                </div>
+
+                <div class="field-wrap">
+                    <label for="{{ form.description.id_for_label }}">Description</label>
+                    {{ form.description }}
+                    {{ form.description.errors }}
+                </div>
+
+                <div class="form-grid two-col">
+                    <div class="field-wrap">
+                        <label for="{{ form.category.id_for_label }}">Category</label>
+                        {{ form.category }}
+                        {{ form.category.errors }}
+                    </div>
+
+                    <div class="field-wrap">
+                        <label for="{{ form.genres.id_for_label }}">Genres</label>
+                        {{ form.genres }}
+                        {{ form.genres.errors }}
+                    </div>
+                </div>
+
+                <div class="form-grid two-col">
+                    <div class="field-wrap">
+                        <label for="{{ form.file_path.id_for_label }}">Book File (optional)</label>
+                        {{ form.file_path }}
+                        {{ form.file_path.errors }}
+                    </div>
+
+                    <div class="field-wrap">
+                        <label for="{{ form.cover_image.id_for_label }}">Cover Image (optional)</label>
+                        {{ form.cover_image }}
+                        {{ form.cover_image.errors }}
+                    </div>
+                </div>
+
+                <div class="form-grid three-col pricing-grid">
+                    <div class="field-wrap">
+                        <label for="{{ form.status.id_for_label }}">Status</label>
+                        {{ form.status }}
+                        {{ form.status.errors }}
+                    </div>
+                </div>
+
+                <div class="pricing-dropdown-wrap" data-paid-only>
+                    <details class="pricing-dropdown" open>
+                        <summary class="pricing-dropdown-summary">Duration &amp; Credit Cost</summary>
+                        <div class="pricing-dropdown-body">
+                            <div class="pricing-option-item">
+                                <label for="{{ form.credit_cost_for_7_days.id_for_label }}">7 days</label>
+                                <div>
+                                    {{ form.credit_cost_for_7_days }}
+                                    {{ form.credit_cost_for_7_days.errors }}
+                                </div>
+                            </div>
+
+                            <div class="pricing-option-item">
+                                <label for="{{ form.credit_cost_for_14_days.id_for_label }}">14 days</label>
+                                <div>
+                                    {{ form.credit_cost_for_14_days }}
+                                    {{ form.credit_cost_for_14_days.errors }}
+                                </div>
+                            </div>
+
+                            <div class="pricing-option-item">
+                                <label for="{{ form.credit_cost_for_20_days.id_for_label }}">20 days</label>
+                                <div>
+                                    {{ form.credit_cost_for_20_days }}
+                                    {{ form.credit_cost_for_20_days.errors }}
+                                </div>
+                            </div>
+
+                            <div class="pricing-option-item">
+                                <label for="{{ form.credit_cost_for_30_days.id_for_label }}">30 days</label>
+                                <div>
+                                    {{ form.credit_cost_for_30_days }}
+                                    {{ form.credit_cost_for_30_days.errors }}
+                                </div>
+                            </div>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="book-form-actions">
+                    <button type="submit" class="btn-submit">Update Book</button>
+                </div>
+            </form>
+        {% endif %}
+    </div>
+</section>
+
+<script src="{% static 'js/book-pricing.js' %}"></script>
+{% endblock %}
