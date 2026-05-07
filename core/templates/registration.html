@@ -1,0 +1,161 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/registration.css' %}">
+{% endblock %}
+
+{% block nav_links %}
+    <a href="{% url 'home_view' %}" class="{% if request.path == '/' or request.path == '/home/' %}active{% endif %}">Home</a>
+{% endblock %}
+
+{% block content %}
+
+    <div id="bg-animation" class="background-animation" aria-hidden="true"></div>
+
+    <div class="register-container">
+        <div class="register-card">
+
+            <!-- Brand -->
+            <div class="brand">
+                <div class="logo">📖 DigiShelf</div>
+                <h1>Create your account</h1>
+                <p class="subtitle">Join thousands of readers in seconds</p>
+            </div>
+
+            <!--
+                Non-field errors (anything not attached to a specific field).
+                In practice this should be empty now that password-mismatch uses
+                add_error('confirm_password', …), but kept as a safety net.
+            -->
+            {% if form.non_field_errors %}
+            <div class="non-field-errors">
+                {% for error in form.non_field_errors %}
+                    <p class="field-error">{{ error }}</p>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <form method="POST" id="register-form" autocomplete="off" novalidate>
+                {% csrf_token %}
+
+                <!-- Full Name -->
+                <div class="form-group">
+                    <label for="fullname">Full Name</label>
+                    <div class="input-wrapper">
+                        <input
+                            type="text"
+                            id="fullname"
+                            name="full_name"
+                            placeholder="Enter your full name"
+                            autocomplete="off"
+                            value="{{ form.full_name.value|default:'' }}"
+                            required>
+                    </div>
+                    {% if form.full_name.errors %}
+                        <span class="field-error">{{ form.full_name.errors.0 }}</span>
+                    {% endif %}
+                </div>
+
+                <!-- Email -->
+                <div class="form-group">
+                    <label for="email">Email address</label>
+                    <div class="input-wrapper">
+                        <input
+                            type="email"
+                            id="email"
+                            name="email"
+                            placeholder="your_email@example.com"
+                            autocomplete="off"
+                            value="{{ form.email.value|default:'' }}"
+                            required>
+                    </div>
+                    <!--
+                        #email-error is used by registration.js for live feedback.
+                        If Django already returned a server-side error (e.g. duplicate
+                        email), it is pre-populated here so it shows immediately.
+                    -->
+                    <span class="field-error" id="email-error">
+                        {% if form.email.errors %}{{ form.email.errors.0 }}{% endif %}
+                    </span>
+                </div>
+
+                <!-- Password -->
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="input-wrapper">
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            placeholder="Create a strong password"
+                            autocomplete="new-password"
+                            required>
+                        <button type="button" onclick="togglePassword()" class="toggle-password" id="eye-icon">👁️</button>
+                    </div>
+                    {% if form.password.errors %}
+                        <span class="field-error">{{ form.password.errors.0 }}</span>
+                    {% endif %}
+                </div>
+
+                <!-- Confirm Password -->
+                <div class="form-group">
+                    <label for="confirm-password">Confirm Password</label>
+                    <div class="input-wrapper">
+                        <input
+                            type="password"
+                            id="confirm-password"
+                            name="confirm_password"
+                            placeholder="Confirm your password"
+                            autocomplete="off"
+                            required>
+                    </div>
+                    <!--
+                        #confirm-password-error is written to by registration.js
+                        for live mismatch feedback, AND pre-populated from Django
+                        when the form is re-rendered after a failed submission.
+                    -->
+                    <span class="field-error" id="confirm-password-error">
+                        {% if form.confirm_password.errors %}{{ form.confirm_password.errors.0 }}{% endif %}
+                    </span>
+                </div>
+
+                <!-- Submit -->
+                <button type="submit" id="send-otp-btn" class="send-otp-btn">
+                    Send Verification Code
+                </button>
+
+                <!-- Terms Checkbox -->
+                <div class="checkbox-group">
+                    <input type="checkbox" id="terms" name="terms" checked>
+                    <label for="terms">
+                        I agree to the <a href="#" style="color:#4b5f61; text-decoration:none;">Terms of Service</a> and
+                        <a href="#" style="color:#4b5f61; text-decoration:none;">Privacy Policy</a>
+                    </label>
+                </div>
+
+            </form>
+
+            <div class="divider"><span>or</span></div>
+
+            <!-- Already have account -->
+            <div class="login-section">
+                <a href="{% url 'login_view' %}" class="login-link-btn">Already have an account? Sign in</a>
+            </div>
+
+            <!-- Cancel Button -->
+            <a href="{% url 'home_view' %}" class="cancel-btn">
+                Cancel &amp; Go to Home
+            </a>
+        </div>
+    </div>
+
+    <!--
+        Pass the check-email URL to JS without hardcoding it.
+        registration.js reads window.CHECK_EMAIL_URL.
+    -->
+    <script>
+        window.CHECK_EMAIL_URL = "{% url 'check_email' %}";
+    </script>
+    <script src="{% static 'js/registration.js' %}"></script>
+{% endblock %}

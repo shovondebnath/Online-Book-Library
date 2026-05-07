@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/login.css' %}">
+{% endblock %}
+
+{% block nav_links %}
+    <a href="{% url 'home_view' %}" class="{% if request.path == '/' or request.path == '/home/' %}active{% endif %}">Home</a>
+{% endblock %}
+
+{% block content %}
+
+    <div id="bg-animation" class="background-animation" aria-hidden="true"></div>
+
+    <div class="login-container">
+        <div class="login-card">
+
+            <!-- Brand -->
+            <div class="brand">
+                <div class="logo">📖 DigiShelf</div>
+                <h1>Welcome back</h1>
+                <p class="subtitle">Sign in to continue your reading journey</p>
+            </div>
+
+            <!--
+                Django messages (e.g. "Session expired. Please log in again.")
+                Only non-error toast-style messages land here; field errors go inline.
+            -->
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+
+            <form method="POST" id="login-form" autocomplete="off" novalidate>
+                {% csrf_token %}
+
+                <!-- Email -->
+                <div class="form-group">
+                    <label for="email">Email address</label>
+                    <div class="input-wrapper">
+                        <input
+                            type="email"
+                            id="email"
+                            name="email"
+                            placeholder="your_mail@email.com"
+                            autocomplete="off"
+                            value="{{ email_value|default:'' }}"
+                            required>
+                    </div>
+                    <!--
+                        #email-error is pre-populated by Django on re-render,
+                        and also written to by login.js for live format feedback.
+                    -->
+                    <span class="field-error" id="email-error">{% if errors.email %}{{ errors.email }}{% endif %}</span>
+                </div>
+
+                <!-- Password -->
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="input-wrapper">
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            placeholder="••••••••"
+                            autocomplete="current-password"
+                            required>
+                        <button type="button" onclick="togglePassword()" class="toggle-password" id="eye-icon">👁️</button>
+                    </div>
+                    <!--
+                        #password-error shows "Incorrect email or password" from Django,
+                        or "Password is required" from client-side guard.
+                    -->
+                    <span class="field-error" id="password-error">{% if errors.password %}{{ errors.password }}{% endif %}</span>
+                </div>
+
+                <!-- Options -->
+                <div class="options">
+                    <label class="remember">
+                        <input type="checkbox" checked>
+                        Remember me
+                    </label>
+                    <a href="{% url 'register' %}" class="forgot">Forgot password?</a>
+                </div>
+
+                <!-- Login Button -->
+                <button type="submit" class="login-btn" id="login-btn">
+                    Sign In
+                </button>
+            </form>
+
+            <div class="divider"><span>or</span></div>
+
+            <!-- Register -->
+            <div class="register-section">
+                <a href="{% url 'register' %}" class="register-btn-main">Create a free account</a>
+            </div>
+
+            <!-- Cancel -->
+            <a href="{% url 'home_view' %}" class="cancel-btn">
+                Cancel &amp; Go to Home
+            </a>
+        </div>
+    </div>
+
+    <script>
+        window.CHECK_LOGIN_EMAIL_URL = "{% url 'check_login_email' %}";
+    </script>
+    <script src="{% static 'js/login.js' %}"></script>
+{% endblock %}

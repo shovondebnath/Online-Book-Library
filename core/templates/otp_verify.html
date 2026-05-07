@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/registration.css' %}">
+{% endblock %}
+
+{% block nav_links %}
+    <a href="{% url 'home_view' %}">Home</a>
+{% endblock %}
+
+{% block content %}
+
+    <div class="register-container">
+        <div class="register-card">
+
+            <!-- Brand -->
+            <div class="brand">
+                <div class="logo">📖 DigiShelf</div>
+                <h1>Verify your email</h1>
+                <p class="subtitle">We sent a 6-digit code to <strong>{{ email }}</strong></p>
+            </div>
+
+            <!-- Django messages -->
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+
+            <form method="POST" id="otp-form" autocomplete="off">
+                {% csrf_token %}
+
+                <div class="form-group">
+                    <label for="id_otp">Verification Code</label>
+                    <div class="input-wrapper">
+                        <input type="text"
+                               id="id_otp"
+                               name="otp"
+                               placeholder="● ● ● ● ● ●"
+                               maxlength="6"
+                               inputmode="numeric"
+                               pattern="[0-9]{6}"
+                               autocomplete="one-time-code"
+                               class="otp-input"
+                               required>
+                    </div>
+                    {% if form.otp.errors %}
+                        <span class="field-error">{{ form.otp.errors.0 }}</span>
+                    {% endif %}
+                </div>
+
+                <p class="otp-timer" id="timer-text">Code expires in <span id="countdown">10:00</span></p>
+
+                <button type="submit" class="register-btn-main">
+                    Verify &amp; Create Account
+                </button>
+            </form>
+
+            <div class="divider"><span>or</span></div>
+
+            <!-- Resend OTP -->
+            <form method="POST" style="margin-bottom: 0;">
+                {% csrf_token %}
+                <button type="submit" name="resend" value="1" class="login-link-btn">
+                    Didn't receive it? Resend code
+                </button>
+            </form>
+
+            <a href="{% url 'register' %}" class="cancel-btn" style="margin-top: 16px;">
+                ← Back to registration
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // Allow only digits in OTP input
+        document.getElementById('id_otp').addEventListener('input', function () {
+            this.value = this.value.replace(/\D/g, '').slice(0, 6);
+        });
+
+        // Countdown timer (10 minutes)
+        let seconds = 600;
+        const display = document.getElementById('countdown');
+        const timerText = document.getElementById('timer-text');
+
+        const interval = setInterval(() => {
+            seconds--;
+            if (seconds <= 0) {
+                clearInterval(interval);
+                timerText.textContent = 'Code has expired. Please request a new one.';
+                timerText.style.color = '#e24b4a';
+                return;
+            }
+            const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+            const s = (seconds % 60).toString().padStart(2, '0');
+            display.textContent = `${m}:${s}`;
+        }, 1000);
+    </script>
+{% endblock %}
