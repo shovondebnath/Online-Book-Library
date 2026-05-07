@@ -16,7 +16,7 @@ function closeCommentModal() {
 
     modal.classList.remove('show');
     setTimeout(() => {
-        modal.style.display = 'none';
+        modal.style.display = 'none' ;
     }, 400);
 }
 
