@@ -219,3 +219,74 @@ def otp_verify_view(request):
 
     return render(request, 'otp_verify.html', {'form': form, 'email': email})
 
+
+def _resend_otp(request, pending):
+    email = pending['email']
+
+    if _is_otp_expired(pending['otp_created_at']):
+        messages.info(request, 'Previous code expired. Sending a new code.')
+
+    new_otp = generate_otp()
+    pending['otp'] = new_otp
+    pending['otp_created_at'] = time.time()
+    request.session[OTP_SESSION_KEY] = pending
+
+    send_mail(
+        subject='Your new DigiShelf Verification Code',
+        message=(
+            f"Hi {pending['full_name']},\n\n"
+            f"Your new verification code is: {new_otp}\n\n"
+            f"This code expires in 10 minutes.\n\n"
+            f"The DigiShelf Team"
+        ),
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        recipient_list=[email],
+        fail_silently=False,
+    )
+
+    messages.success(request, 'A new OTP has been sent to your email.')
+    return redirect('otp_verify')
+
+
+
+def auth_login_view(request):
+    if request.user.is_authenticated:
+        return redirect('home_view')
+
+    errors = {}
+    email_value = ''
+
+    if request.method == 'POST':
+        email = request.POST.get('email', '').strip().lower()
+        password = request.POST.get('password', '')
+        email_value = email
+
+        if not email:
+            errors['email'] = 'Email address is required.'
+        elif not _is_valid_email_format(email):
+            errors['email'] = 'Please enter a valid email address.'
+
+        if not password:
+            errors['password'] = 'Password is required.'
+
+        if not errors:
+            user = User.objects.filter(email=email).first()
+
+            if user is None or not user.check_password(password):
+                errors['password'] = 'Incorrect email or password.'
+            elif not user.is_active:
+                errors['password'] = 'This account has been disabled.'
+            else:
+                auth_login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+                next_url = request.POST.get('next') or request.GET.get('next') or 'home_view'
+                return redirect(next_url)
+
+    return render(request, 'login.html', {
+        'errors': errors,
+        'email_value': email_value,
+    })
+
+
+def logout_view(request):
+    auth_logout(request)
+    return redirect('home_view')
