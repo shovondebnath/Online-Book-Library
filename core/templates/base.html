@@ -1,0 +1,92 @@
+<!-- 3_index -->
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <script src="{% static 'js/toast.js' %}" defer></script>
+    {% block extra_css %}{% endblock %}
+    <title>DigiSelf</title>
+    <link rel="shortcut icon" href="{% static 'image/books.png' %}" type="image/x-icon">
+</head>
+<body>
+    <nav>
+        <!-- Logo -->
+        <div class="pacifico-regular" style="font-size: 22px; margin: 0; padding: 0; border: 0">DigiShelf</div>
+
+        <!-- Menu -->
+        <div class="nav-menu">
+            {% block nav_links %}
+            {% endblock %}
+            <a href="{% url 'about_view' %}" class="{% if request.path == '/about/' %}active{% endif %}">About Us</a>
+            <a href="{% url 'support_view' %}" class="{% if request.path == '/support/' %}active{% endif %}">Support</a>
+            {% if request.user.is_authenticated and request.user.is_staff %}
+                <a href="{% url 'book_entry' %}" class="{% if request.path == '/staff_page/book-entry/' %}active{% endif %}">Book Entry</a>
+            {% endif %}
+            {% if request.user.is_authenticated %}
+                <div class="profile-menu" id="profile-menu">
+                    <button
+                        type="button"
+                        class="avatar-trigger"
+                        id="avatar-trigger"
+                        aria-label="Open profile menu"
+                        aria-haspopup="true"
+                        aria-expanded="false"
+                        aria-controls="profile-dropdown">
+                        <img
+                            src="{% static 'image/User-Avatar-Profile-PNG-Pic-Clip-Art-Background.png' %}"
+                            alt="Profile avatar"
+                            class="avatar-image">
+                    </button>
+
+                    <div class="profile-dropdown" id="profile-dropdown" hidden>
+                        <div class="profile-header">
+                            <p class="profile-email">{{ request.user.email|default:request.user.username }}</p>
+                            <p class="profile-name">{{ request.user.get_full_name|default:request.user.username }}</p>
+                        </div>
+
+                        <a
+                            href="{% url 'openbook' %}"
+                            class="profile-item"
+                            id="my-books-trigger"
+                            data-list-url="{% url 'my_books_list' %}"
+                            style="color: #122126; background-color: rgb(201, 242, 217);">
+                            My Book
+                        </a>
+                        <button type="button" class="profile-item profile-action" data-profile-action="transactions">Transaction</button>
+                        <button type="button" class="profile-item profile-action" data-profile-action="credit">Credit</button>
+                        <a href="{% url 'logout_view' %}" class="profile-item profile-logout " style="color: #8b1f1f;">Logout</a>
+                        <p class="profile-note" id="profile-note" aria-live="polite"></p>
+                    </div>
+                </div>
+            {% else %}
+                <a href="{% url 'login_view' %}" class="{% if request.path == '/login/' %}active{% endif %}">Login</a>
+                <button class="register-btn"><a href="{% url 'register' %}">Register</a></button>
+            {% endif %}
+        </div>
+    </nav>
+    {% block content %}
+    {% endblock %}
+
+    {% if request.user.is_authenticated %}
+    <div class="library-modal" id="myBooksModal" aria-hidden="true" style="display: none;">
+        <div class="library-modal-content" role="dialog" aria-modal="true" aria-labelledby="myBooksModalTitle">
+            <div class="library-modal-header">
+                <h2 id="myBooksModalTitle">My Book</h2>
+                <button type="button" class="library-modal-close" id="myBooksModalClose" aria-label="Close My Book">×</button>
+            </div>
+            <div class="library-modal-body">
+                <p class="library-books-hint">Select any saved book to open its details page.</p>
+                <p class="library-books-status" id="myBooksStatus">Loading your books...</p>
+                <div class="library-books-list" id="myBooksList"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{% static 'js/nav-profile.js' %}"></script>
+    {% endif %}
+
+</body>
+</html>
