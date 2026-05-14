@@ -1,0 +1,150 @@
+{% load static %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/openbook.css' %}">
+{% endblock %}
+
+
+<div class="fb-comment" id="review-{{ review.id }}">
+    <div class="fb-comment-main">
+
+        <div class="fb-avatar">{{ review.user.get_full_name|default:review.user.username|slice:":1"|upper }}</div>
+
+        <div class="fb-comment-body">
+            <div class="fb-bubble">
+                <span class="fb-comment-author">{{ review.user.get_full_name|default:review.user.username }}</span>
+                <div class="fb-comment-text">{{ review.review_text|linebreaksbr }}</div>
+            </div>
+
+            <div class="fb-actions-row">
+                <span class="fb-time">{{ review.created_at|timesince }} ago</span>
+                <span class="fb-dot-sep">·</span>
+
+                {% if request.user.is_authenticated %}
+                    <form method="post" action="{% url 'openbook_detail' book.book_id %}?show_comments=1" class="inline-action-form">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="react">
+                        <input type="hidden" name="review_id" value="{{ review.id }}">
+                        <input type="hidden" name="reaction_type" value="LIKE">
+                        <input type="hidden" name="comments_page" value="{{ comments_page|default:1 }}">
+                        <button type="submit" class="fb-action-btn{% if review.user_reaction == 'LIKE' %} like-active{% endif %}" aria-label="Like comment">
+                            <svg class="fb-like-icon" viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M14 9V5a3 3 0 0 0-3-3L7 11v9h11a2 2 0 0 0 2-2l1-7a2 2 0 0 0-2-2z"></path>
+                                <path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path>
+                            </svg>
+                            Like{% if review.like_count %} <span class="fb-like-count">· {{ review.like_count }}</span>{% endif %}
+                        </button>
+                    </form>
+                    <span class="fb-dot-sep">·</span>
+                    <button type="button" class="fb-action-btn" onclick="toggleReplyForm('reply-form-{{ review.id }}')">Reply</button>
+                {% else %}
+                    <span class="fb-reaction-display">
+                        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 9V5a3 3 0 0 0-3-3L7 11v9h11a2 2 0 0 0 2-2l1-7a2 2 0 0 0-2-2z"></path>
+                            <path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path>
+                        </svg>
+                        {{ review.like_count|default:0 }}
+                    </span>
+                    <span class="fb-dot-sep">·</span>
+                    <a href="{% url 'login_view' %}?next={{ request.get_full_path|urlencode }}" class="fb-action-btn fb-login-link">Log in to reply</a>
+                {% endif %}
+
+                {% if review.reply_children %}
+                    <span class="fb-dot-sep">·</span>
+                    <button
+                        type="button"
+                        class="fb-action-btn fb-replies-toggle"
+                        aria-controls="reply-list-{{ review.id }}"
+                        aria-expanded="true"
+                        onclick="toggleReplies('reply-list-{{ review.id }}', this)">
+                        <svg class="fb-replies-chevron" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="9 10 4 15 9 20"></polyline>
+                            <path d="M20 4v7a4 4 0 0 1-4 4H4"></path>
+                        </svg>
+                        {{ review.reply_children|length }} Repl{{ review.reply_children|length|pluralize:"y,ies" }}
+                    </button>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if request.user.is_authenticated and review.user_id == request.user.id %}
+        <div class="fb-more-wrap">
+            <button type="button" class="fb-more-btn" onclick="toggleMoreMenu('more-{{ review.id }}')">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                    <circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/>
+                </svg>
+            </button>
+            <div class="fb-dropdown" id="more-{{ review.id }}">
+                <button type="button" class="fb-dropdown-item" onclick="toggleEditForm('edit-form-{{ review.id }}'); toggleMoreMenu('more-{{ review.id }}')">
+                    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 20h9"></path>
+                        <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"></path>
+                    </svg>
+                    Edit
+                </button>
+                <form method="post" action="{% url 'openbook_detail' book.book_id %}?show_comments=1" style="margin:0">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="delete">
+                    <input type="hidden" name="review_id" value="{{ review.id }}">
+                    <input type="hidden" name="comments_page" value="{{ comments_page|default:1 }}">
+                    <button type="submit" class="fb-dropdown-item delete-item" onclick="return confirm('Delete this comment and all replies?')">
+                        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="3 6 5 6 21 6"></polyline>
+                            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path>
+                            <path d="M10 11v6"></path>
+                            <path d="M14 11v6"></path>
+                            <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"></path>
+                        </svg>
+                        Delete
+                    </button>
+                </form>
+            </div>
+        </div>
+        {% endif %}
+
+    </div>
+
+    {% if request.user.is_authenticated and review.user_id == request.user.id %}
+    <div class="fb-edit-form" id="edit-form-{{ review.id }}">
+        <form method="post" action="{% url 'openbook_detail' book.book_id %}?show_comments=1" class="fb-edit-inner">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="edit">
+            <input type="hidden" name="review_id" value="{{ review.id }}">
+            <input type="hidden" name="comments_page" value="{{ comments_page|default:1 }}">
+            <textarea name="comment_text" required>{{ review.review_text }}</textarea>
+            <button type="submit" class="fb-send-btn" aria-label="Save changes">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
+            </button>
+        </form>
+    </div>
+    {% endif %}
+
+    {% if request.user.is_authenticated %}
+    <div class="fb-reply-form" id="reply-form-{{ review.id }}">
+        <div class="fb-avatar fb-avatar-sm">{{ request.user.get_full_name|default:request.user.username|slice:":1"|upper }}</div>
+        <form method="post" action="{% url 'openbook_detail' book.book_id %}?show_comments=1" class="fb-reply-inner">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="create">
+            <input type="hidden" name="parent_review_id" value="{{ review.id }}">
+            <input type="hidden" name="comments_page" value="{{ comments_page|default:1 }}">
+            <textarea name="comment_text" placeholder="Write a reply..." required></textarea>
+            <button type="submit" class="fb-send-btn" aria-label="Post reply">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
+            </button>
+        </form>
+    </div>
+    {% endif %}
+
+    {% if review.reply_children %}
+        <div class="fb-reply-list" id="reply-list-{{ review.id }}">
+            {% for reply in review.reply_children %}
+                {% include 'partials/review_item.html' with review=reply book=book comments_page=comments_page %}
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>

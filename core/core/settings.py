@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'storages',
     'app',
-    'book',
+    'site_controller',
     'authentication',
     'data_entry',
 ]
@@ -80,11 +80,11 @@ WSGI_APPLICATION = 'core.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'postgres',
-        'USER': 'pooler_IPv4_user_form_supabase',
-        'PASSWORD': 'supabase_password',
-        'HOST': 'pooler-ipv4-user-form-supabase.supabase.co',
+        'USER': 'postgres.wrvjhptmncjkpkperosh',
+        'PASSWORD': 'zdC0ftovLBMBis4N',
+        'HOST': 'aws-1-ap-northeast-1.pooler.supabase.com',
         'PORT': '5432',
         'OPTIONS': {
             'sslmode': 'require',
@@ -136,10 +136,11 @@ EMAIL_HOST       = 'smtp.gmail.com'
 EMAIL_PORT       = 587
 EMAIL_USE_TLS = True      # STARTTLS
 EMAIL_USE_SSL = False
-EMAIL_HOST_USER = 'your_email@gmail.com'  # Replace with your email
+EMAIL_HOST_USER = 'shovondevnath616@gmail.com'
 
-EMAIL_HOST_PASSWORD = 'your_app_password'   # Use an App Password, not your real password
-DEFAULT_FROM_EMAIL = 'your_email@gmail.com'
+EMAIL_HOST_PASSWORD = 'ibsppkeusyptzuak'   # Use an App Password, not your real password
+DEFAULT_FROM_EMAIL = 'shovondevnath616@gmail.com'
+
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
@@ -154,13 +155,19 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 
 # Supabase Storage (S3-compatible API)
-SUPABASE_PROJECT_REF = 'project-ref'
-SUPABASE_S3_ENDPOINT = 'endpoint_url'  # e.g. 'https://your-project.supabase.co/storage/v1'
+SUPABASE_PROJECT_REF = os.getenv('SUPABASE_PROJECT_REF', 'wrvjhptmncjkpkperosh')
+SUPABASE_S3_ENDPOINT = os.getenv(
+    'SUPABASE_S3_ENDPOINT',
+    'https://wrvjhptmncjkpkperosh.storage.supabase.co/storage/v1/s3',
+)
 
-AWS_ACCESS_KEY_ID = 'your_access_key_id'  # Replace with your Supabase S3 access key
-AWS_SECRET_ACCESS_KEY = 'your_secret_access_key'  # Replace with your Supabase S3 secret key
+AWS_ACCESS_KEY_ID = os.getenv('SUPABASE_S3_ACCESS_KEY_ID', '2a1aa05311e70dc63fbc9de5b6070271')
+AWS_SECRET_ACCESS_KEY = os.getenv(
+    'SUPABASE_S3_SECRET_ACCESS_KEY',
+    '4ce52901564e95ac9b5100887ac3d71a329c7277cc11a189ce982fc51f8cde7e',
+)
 AWS_S3_ENDPOINT_URL = SUPABASE_S3_ENDPOINT
-AWS_S3_REGION_NAME = 'us-east-1'  # Supabase S3 is compatible with this region
+AWS_S3_REGION_NAME = os.getenv('SUPABASE_S3_REGION', 'ap-northeast-1')
 AWS_S3_SIGNATURE_VERSION = 's3v4'
 AWS_S3_ADDRESSING_STYLE = 'path'
 AWS_DEFAULT_ACL = None
