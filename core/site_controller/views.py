@@ -538,11 +538,10 @@ def borrow_book_view(request, book_id):
 
 
 def ebook_reader_view(request, book_id):
-	if not request.user.is_authenticated:
-		return _login_redirect(request)
-
 	book = get_object_or_404(Book, book_id=book_id)
 	if book.book_paid:
+		if not request.user.is_authenticated:
+			return _login_redirect(request)
 		active_borrow = _get_active_borrow(request.user, book)
 		if not active_borrow:
 			messages.error(request, 'Please borrow this book before opening the reader.')
@@ -557,6 +556,7 @@ def ebook_reader_view(request, book_id):
 		messages.error(request, 'This book file is not available for reading right now.')
 		return redirect(reverse('openbook_detail', args=[book.book_id]))
 
+	username = request.user.username if request.user.is_authenticated else 'GUEST'
 	return render(
 		request,
 		'ebook-reader.html',
@@ -565,7 +565,7 @@ def ebook_reader_view(request, book_id):
 			'reader_pdf_url': pdf_url,
 			'reader_title': book.title,
 			'library_name': 'DigiShelf',
-			'reader_watermark': f'DIGISHELF COPY · USER {request.user.username} · BOOK {book.book_id}',
+			'reader_watermark': f'DIGISHELF COPY · USER {username} · BOOK {book.book_id}',
 			'lock_reader_url': True,
 		},
 	)

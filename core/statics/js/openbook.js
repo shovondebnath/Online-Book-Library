@@ -188,6 +188,17 @@ document.addEventListener('DOMContentLoaded', function () {
     const borrowPanel = document.getElementById('borrowPanel');
     if (borrowToggleBtn && borrowPanel) {
         borrowToggleBtn.addEventListener('click', () => {
+            const isAuthenticated = borrowToggleBtn.dataset.isAuthenticated === '1';
+            const loginUrl = borrowToggleBtn.dataset.loginUrl || '';
+            if (!isAuthenticated) {
+                notify('Please log in to borrow this book.', { tone: 'warning', duration: 2600 });
+                if (loginUrl) {
+                    window.setTimeout(() => {
+                        window.location.assign(loginUrl);
+                    }, 900);
+                }
+                return;
+            }
             const isOpen = borrowPanel.classList.toggle('show');
             borrowToggleBtn.classList.toggle('active', isOpen);
         });

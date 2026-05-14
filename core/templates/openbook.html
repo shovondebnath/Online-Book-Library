@@ -45,7 +45,12 @@
                         + Add to My Library
                     </button>
                 {% else %}
-                    <button class="btn borrow-btn" type="button" id="borrowToggleBtn">
+                    <button
+                        class="btn borrow-btn"
+                        type="button"
+                        id="borrowToggleBtn"
+                        data-is-authenticated="{% if request.user.is_authenticated %}1{% else %}0{% endif %}"
+                        data-login-url="{% url 'login_view' %}?next={{ request.get_full_path|urlencode }}">
                         Borrow
                     </button>
                 {% endif %}
