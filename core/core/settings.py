@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'site_controller',
     'authentication',
     'data_entry',
+    'recommendation_system',
 ]
 
 MIDDLEWARE = [
