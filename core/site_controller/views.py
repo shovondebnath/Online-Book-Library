@@ -22,6 +22,11 @@ from app.models import (
 	Review,
 	ReviewReaction,
 )
+from recommendation_system.services import (
+	get_openbook_recommendations,
+	record_category_read,
+	record_search_event,
+)
 
 
 COMMENTS_PER_PAGE = 8
@@ -374,6 +379,8 @@ def search_page_view(request):
 	raw_query_normalized = ' '.join((raw_query or '').split())
 	query = _normalize_search_query(raw_query)
 	page_number = _safe_comments_page(request.GET.get('page'))
+	if query and request.user.is_authenticated:
+		record_search_event(request.user, query)
 
 	error_message = None
 	notice_message = None
@@ -699,11 +706,14 @@ def openbook_view(request, book_id=None):
 			},
 		)
 
+	if request.user.is_authenticated and book.category_id:
+		record_category_read(request.user, book.category_id)
+
 	if request.method == 'POST':
 		return _handle_review_post(request, book)
 
 	genres_list = [genre.strip() for genre in (book.genres or '').split(',') if genre.strip()]
-	recommendations = books_queryset.exclude(book_id=book.book_id)[:8]
+	recommendations = get_openbook_recommendations(request.user, book, books_queryset)
 	top_level_reviews = _build_review_tree(book, request.user)
 	comments_page = _safe_comments_page(request.GET.get('comments_page'))
 	reviews_paginator = Paginator(top_level_reviews, COMMENTS_PER_PAGE)
