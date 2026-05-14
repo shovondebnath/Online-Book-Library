@@ -299,6 +299,11 @@ def _rate_book(request, book):
 		messages.error(request, 'Please select a valid star rating.')
 		return redirect(reverse('openbook_detail', args=[book.book_id]))
 
+	if rating_value == 0:
+		Rating.objects.filter(user=request.user, book=book).delete()
+		messages.info(request, 'Your rating was removed.')
+		return redirect(reverse('openbook_detail', args=[book.book_id]))
+
 	if rating_value < MIN_BOOK_RATING or rating_value > MAX_BOOK_RATING:
 		messages.error(request, f'Rating must be between {MIN_BOOK_RATING} and {MAX_BOOK_RATING}.')
 		return redirect(reverse('openbook_detail', args=[book.book_id]))

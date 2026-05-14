@@ -134,21 +134,27 @@ async function saveCurrentBookToMyBook(button) {
 }
 
 let currentRating = 0;
+
 function setRating(value, submitAfterSelect = true) {
-    currentRating = value;
+    let nextValue = value;
+    if (submitAfterSelect && currentRating === value) {
+        nextValue = 0;
+    }
+
+    currentRating = nextValue;
     const stars = document.querySelectorAll('.rate .rating-star');
     stars.forEach((star, index) => {
-        star.classList.toggle('active', index < value);
+        star.classList.toggle('active', index < nextValue);
     });
 
     const ratingValueInput = document.getElementById('ratingValueInput');
     if (ratingValueInput) {
-        ratingValueInput.value = String(value);
+        ratingValueInput.value = nextValue ? String(nextValue) : '0';
     }
 
     if (submitAfterSelect) {
         const ratingForm = document.getElementById('ratingForm');
-        if (ratingForm && ratingValueInput && ratingValueInput.value) {
+        if (ratingForm && ratingValueInput) {
             ratingForm.submit();
         }
     }
