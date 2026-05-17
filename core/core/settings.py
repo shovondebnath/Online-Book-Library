@@ -63,7 +63,7 @@ ROOT_URLCONF = 'core.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],
+        'DIRS': [os.path.join(BASE_DIR / 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -176,3 +176,7 @@ AWS_S3_ADDRESSING_STYLE = 'path'
 AWS_DEFAULT_ACL = None
 AWS_QUERYSTRING_AUTH = False
 AWS_S3_FILE_OVERWRITE = False
+
+
+STRIPE_SECRET_KEY = ''
+STRIPE_PUBLISHABLE_KEY = 'pk_test_51TY1lSCYulxeZXnZPh0DYyb9QUk1Ykmtg23vpbOQdVNvWtFaGKqweHYG4vuuGN7CNcKxVj3GugTO4bOBYjHFlrPx0007ViML1D'
