@@ -44,6 +44,8 @@ INSTALLED_APPS = [
     'authentication',
     'data_entry',
     'recommendation_system',
+
+    'payments.apps.PaymentsConfig',
 ]
 
 MIDDLEWARE = [

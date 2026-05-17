@@ -23,4 +23,5 @@ urlpatterns = [
     path('', include('site_controller.urls')),
     path('', include('app.urls')),
     path('staff_page/', include('data_entry.urls')),
+    path('', include('payments.urls')),
 ]
