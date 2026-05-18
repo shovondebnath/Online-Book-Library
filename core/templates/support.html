@@ -10,66 +10,83 @@
 {% endblock %}
 
 {% block content %}
-    <div class="support-page">
-        <section class="contact-section">
-            <div class="contact-card">
-                <div class="contact-intro">
-                    <h2>Still need help? Create a ticket.</h2>
-                    <p>Give us the details and we'll reply with a clear plan.</p>
-                    <div class="contact-stats">
-                        <div class="stat-item">
-                            <span>First reply</span>
-                            <strong>About 2 hours</strong>
+    <div class="support-shell">
+        <div class="support-page">
+            <section class="contact-section">
+                <div class="contact-card">
+                    <div class="contact-intro">
+                        <h2>Still need help? Create a ticket.</h2>
+                        <p>Give us the details and we'll reply with a clear plan.</p>
+                        <div class="contact-stats">
+                            <div class="stat-item">
+                                <span>First reply</span>
+                                <strong>About 2 hours</strong>
+                            </div>
+                            <div class="stat-item">
+                                <span>Resolution rate</span>
+                                <strong>92%</strong>
+                            </div>
+                            <div class="stat-item">
+                                <span>Coverage</span>
+                                <strong>Mon – Fri</strong>
+                            </div>
                         </div>
-                        <div class="stat-item">
-                            <span>Resolution rate</span>
-                            <strong>92%</strong>
-                        </div>
-                        <div class="stat-item">
-                            <span>Coverage</span>
-                            <strong>Mon – Fri</strong>
-                        </div>
+                    </div>
+                    <div class="contact-form">
+                        <form id="support-form" method="post" action="{% url 'support_view' %}" novalidate>
+                            {% csrf_token %}
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="name">Name</label>
+                                    <input type="text" id="name" name="name" placeholder="Your full name" autocomplete="off" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="email">Email</label>
+                                    <input type="email" id="email" name="email" placeholder="you@example.com" autocomplete="off" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="topic">Topic</label>
+                                    <select id="topic" name="topic" required>
+                                        <option>Book download issue</option>
+                                        <option>Account and login</option>
+                                        <option>Billing and refund</option>
+                                        <option>Technical support</option>
+                                        <option>Other</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="order-id">Order or book ID (optional)</label>
+                                    <input type="text" id="order-id" name="order_id" placeholder="Example: DS-784392">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="message">How can we help you?</label>
+                                <textarea id="message" name="message" placeholder="Share the details so we can help faster." required></textarea>
+                            </div>
+                            <button onclick="submitTicket()" class="submit-btn" type="button">
+                                Submit support ticket
+                            </button>
+                            <p class="form-hint">
+                                We usually reply within 2 hours. Mon – Fri, 9 AM – 8 PM (GMT+6).
+                            </p>
+                        </form>
                     </div>
                 </div>
-                <div class="contact-form">
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label for="name">Name</label>
-                            <input type="text" id="name" name="name" placeholder="Your full name" autocomplete="off">
-                        </div>
-                        <div class="form-group">
-                            <label for="email">Email</label>
-                            <input type="email" id="email" name="email" placeholder="you@example.com" autocomplete="off">
-                        </div>
-                        <div class="form-group">
-                            <label for="topic">Topic</label>
-                            <select id="topic">
-                                <option>Book download issue</option>
-                                <option>Account and login</option>
-                                <option>Billing and refund</option>
-                                <option>Technical support</option>
-                                <option>Other</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="order-id">Order or book ID (optional)</label>
-                            <input type="text" id="order-id" placeholder="Example: DS-784392">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="message">How can we help you?</label>
-                        <textarea id="message" placeholder="Share the details so we can help faster."></textarea>
-                    </div>
-                    <button onclick="submitTicket()" class="submit-btn" type="button">
-                        Submit support ticket
-                    </button>
-                    <p class="form-hint">
-                        We usually reply within 2 hours. Mon – Fri, 9 AM – 8 PM (GMT+6).
-                    </p>
-                </div>
-            </div>
-        </section>
+            </section>
+        </div>
     </div>
+
+    {% if messages %}
+        <script>
+            window.addEventListener('DOMContentLoaded', function () {
+                {% for message in messages %}
+                    if (typeof window.showAppToast === 'function') {
+                        window.showAppToast('{{ message|escapejs }}', { tone: '{{ message.tags|default:"info" }}' });
+                    }
+                {% endfor %}
+            });
+        </script>
+    {% endif %}
 
     <script src="{% static 'js/support.js' %}"></script>
 {% endblock %}

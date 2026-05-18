@@ -19,6 +19,7 @@ function showToast(message, tone) {
 }
 
 function submitTicket() {
+    const form = document.getElementById('support-form');
     const nameInput    = document.getElementById('name');
     const emailInput   = document.getElementById('email');
     const messageInput = document.getElementById('message');
@@ -42,14 +43,9 @@ function submitTicket() {
         return;
     }
 
-    const ticketId   = `DS-${Math.floor(100000 + Math.random() * 900000)}`;
-    const topicValue = topicInput ? topicInput.value : 'General';
-    const reply      = `Thanks, ${nameValue}. Your ticket ${ticketId} has been submitted. Topic: ${topicValue}. We'll reply within 2 hours.`;
-
-    showToast(reply, 'success');
-
-    if (messageInput) messageInput.value = '';
-    if (orderInput)   orderInput.value   = '';
+    if (form) {
+        form.requestSubmit();
+    }
 }
 
 window.submitTicket = submitTicket;
