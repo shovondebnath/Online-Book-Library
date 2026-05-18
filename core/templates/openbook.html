@@ -31,7 +31,20 @@
 
         <div class="buttons">
             {% if book.book_paid %}
-                {% if can_read %}
+                {% if request.user.is_staff %}
+                    <a class="btn read-btn" href="{% url 'ebook_reader' book.book_id %}" target="_blank" rel="noopener">
+                        Read Now
+                    </a>
+                    <button
+                        class="btn library-btn"
+                        type="button"
+                        id="addToLibraryBtn"
+                        data-save-url="{% url 'my_books_add' book.book_id %}"
+                        data-is-authenticated="{% if request.user.is_authenticated %}1{% else %}0{% endif %}"
+                        data-login-url="{% url 'login_view' %}?next={{ request.get_full_path|urlencode }}">
+                        + Add to My Library
+                    </button>
+                {% elif can_read %}
                     <a class="btn read-btn" href="{% url 'ebook_reader' book.book_id %}" target="_blank" rel="noopener">
                         Read Now
                     </a>
