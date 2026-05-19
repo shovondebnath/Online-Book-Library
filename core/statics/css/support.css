@@ -129,7 +129,7 @@ body {
     flex-direction: column;
     gap: 18px;
     color: var(--clr-text);
-}
+     margin-top: 12px; /* Adjusted to create more space between intro and form */
 
 .form-grid {
     display: grid;
@@ -142,6 +142,8 @@ body {
     flex-direction: column;
     gap: 5px;
 }
+ 
+ 
 
 .form-group label {
     font-size: 13px;
@@ -201,6 +203,7 @@ body {
 
 .submit-btn {
     align-self: flex-start;
+    margin-top: 12px;
     background: var(--clr-accent);
     color: #ffffff;
     border: none;
@@ -226,6 +229,7 @@ body {
     font-size: 12px;
     color: var(--clr-muted);
     line-height: 1.5;
+    margin-top: 12px;
 }
 
 /* ── Responsive ── */
