@@ -1,42 +1,49 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 :root {
-    --clr-bg:           #e8edf2;
+    --clr-page-bg:      #272a2f;
     --clr-surface:      #ffffff;
-    --clr-sidebar:      #cddbea;
-    --clr-border:       #d1d9e0;
-    --clr-border-focus: #2563eb;
-    --clr-accent:       #2563eb;
-    --clr-accent-hover: #1d4ed8;
-    --clr-text:         #f0f2f7;
+    --clr-sidebar:      #3f4f52;
+    --clr-border:       #d1d5db;
+    --clr-border-focus: #4b5f61;
+    --clr-accent:       #4b5f61;
+    --clr-accent-hover: #3a4a4c;
+    --clr-text:         #111827;
+    --clr-text-inverse: #f8fafc;
     --clr-muted:        #6b7280;
-    --clr-label:        #374151;
+    --clr-label:        #1f2937;
     --clr-error:        #dc2626;
     --clr-error-ring:   rgba(220, 38, 38, 0.18);
-    --clr-stat-bg:      #eff6ff;
-    --clr-stat-border:  #bfdbfe;
+    --clr-stat-bg:      rgba(255, 255, 255, 0.08);
+    --clr-stat-border:  rgba(255, 255, 255, 0.2);
     --radius-card:      16px;
     --radius-input:     8px;
-    --radius-btn:       8px;
+    --radius-btn:       999px;
     --font:             'Inter', 'Segoe UI', system-ui, sans-serif;
-    --shadow-card:      0 1px 3px rgba(0,0,0,.08), 0 8px 24px rgba(0,0,0,.06);
+    --shadow-card:      0 12px 30px rgba(0, 0, 0, 0.25);
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
     font-family: var(--font);
-    background: var(--clr-bg);
-    color: var(--clr-text);
+    background: var(--clr-page-bg);
+    color: var(--clr-text-inverse);
     -webkit-font-smoothing: antialiased;
 }
 
 /* ── Page wrapper ── */
 
+.support-shell {
+    background: radial-gradient(circle at top left, rgba(75, 95, 97, 0.55), transparent 60%),
+        linear-gradient(135deg, rgba(75, 95, 97, 0.4), rgba(39, 42, 47, 0.95));
+    padding: 48px 0 88px;
+}
+
 .support-page {
     max-width: 980px;
     margin: 0 auto;
-    padding: 48px 24px 80px;
+    padding: 0 24px;
 }
 
 /* ── Card ── */
@@ -51,7 +58,7 @@ body {
     display: grid;
     grid-template-columns: 280px 1fr;
     gap: 0;
-    background: #ffffff;
+    background: var(--clr-surface);
     border: 1px solid var(--clr-border);
     border-radius: var(--radius-card);
     box-shadow: var(--shadow-card);
@@ -63,8 +70,8 @@ body {
 
 .contact-intro {
     padding: 40px 32px;
-    background: var(--clr-sidebar);
-    border-right: 1px solid var(--clr-border);
+    background: linear-gradient(160deg, #46595c, #324245);
+    border-right: 1px solid rgba(255, 255, 255, 0.12);
     display: flex;
     flex-direction: column;
     gap: 20px;
@@ -74,12 +81,12 @@ body {
     font-size: 20px;
     font-weight: 700;
     line-height: 1.35;
-    color: var(--clr-text);
+    color: var(--clr-text-inverse);
 }
 
 .contact-intro > p {
     font-size: 14px;
-    color: var(--clr-muted);
+    color: rgba(248, 250, 252, 0.75);
     line-height: 1.6;
 }
 
@@ -105,13 +112,13 @@ body {
     font-weight: 500;
     text-transform: uppercase;
     letter-spacing: .04em;
-    color: var(--clr-muted);
+    color: rgba(248, 250, 252, 0.7);
 }
 
 .stat-item strong {
     font-size: 14px;
     font-weight: 600;
-    color: var(--clr-accent);
+    color: #ffffff;
 }
 
 /* ── Right form ── */
@@ -121,7 +128,8 @@ body {
     display: flex;
     flex-direction: column;
     gap: 18px;
-}
+    color: var(--clr-text);
+     margin-top: 12px; /* Adjusted to create more space between intro and form */
 
 .form-grid {
     display: grid;
@@ -134,6 +142,8 @@ body {
     flex-direction: column;
     gap: 5px;
 }
+ 
+ 
 
 .form-group label {
     font-size: 13px;
@@ -147,7 +157,7 @@ body {
     font-family: var(--font);
     font-size: 14px;
     color: var(--clr-text);
-    background: #fff;
+    background: #ffffff;
     border: 1px solid var(--clr-border);
     border-radius: var(--radius-input);
     padding: 9px 12px;
@@ -176,7 +186,7 @@ body {
 .form-group textarea:focus {
     outline: none;
     border-color: var(--clr-border-focus);
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, .15);
+    box-shadow: 0 0 0 3px rgba(75, 95, 97, .25);
 }
 
 .form-group input::placeholder,
@@ -193,11 +203,12 @@ body {
 
 .submit-btn {
     align-self: flex-start;
+    margin-top: 12px;
     background: var(--clr-accent);
     color: #ffffff;
     border: none;
     border-radius: var(--radius-btn);
-    padding: 10px 22px;
+    padding: 10px 24px;
     font-family: var(--font);
     font-size: 14px;
     font-weight: 600;
@@ -218,6 +229,7 @@ body {
     font-size: 12px;
     color: var(--clr-muted);
     line-height: 1.5;
+    margin-top: 12px;
 }
 
 /* ── Responsive ── */
@@ -244,7 +256,7 @@ body {
 
 @media (max-width: 480px) {
     .support-page {
-        padding: 24px 16px 64px;
+        padding: 0 16px;
     }
 }
 

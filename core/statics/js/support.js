@@ -18,7 +18,7 @@ function showToast(message, tone) {
     }
 }
 
-function submitTicket() {
+function validateTicketForm() {
     const nameInput    = document.getElementById('name');
     const emailInput   = document.getElementById('email');
     const messageInput = document.getElementById('message');
@@ -39,22 +39,37 @@ function submitTicket() {
 
     if (nameInvalid || emailInvalid || messageInvalid) {
         showToast('Please fill in your name, a valid email, and a detailed message.', 'warning');
+        return false;
+    }
+
+    return true;
+}
+
+function submitTicket() {
+    const form = document.getElementById('support-form');
+    if (!form) return;
+
+    if (!validateTicketForm()) {
         return;
     }
 
-    const ticketId   = `DS-${Math.floor(100000 + Math.random() * 900000)}`;
-    const topicValue = topicInput ? topicInput.value : 'General';
-    const reply      = `Thanks, ${nameValue}. Your ticket ${ticketId} has been submitted. Topic: ${topicValue}. We'll reply within 2 hours.`;
-
-    showToast(reply, 'success');
-
-    if (messageInput) messageInput.value = '';
-    if (orderInput)   orderInput.value   = '';
+    if (form) {
+        form.requestSubmit();
+    }
 }
 
 window.submitTicket = submitTicket;
 
 document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('support-form');
+    if (form) {
+        form.addEventListener('submit', (event) => {
+            if (!validateTicketForm()) {
+                event.preventDefault();
+            }
+        });
+    }
+
     ['name', 'email', 'message'].forEach((id) => {
         const field = document.getElementById(id);
         if (field) field.addEventListener('input', () => setFieldInvalid(field, false));
