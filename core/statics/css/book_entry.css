@@ -285,3 +285,14 @@
         margin-top: 0;
     }
 }
+
+@media (max-width: 460px) {
+    .book-entry-header p {
+        margin: 0 0 11px;
+        color: #435e58;
+    }
+
+    .btn-secondary {
+        margin: 0 0 12px;
+    }
+}

@@ -968,6 +968,175 @@
                 margin-top: 40px;
             }
         }
+
+        @media (max-width: 460px) {
+            body {
+                padding-bottom: 64px;
+            }
+
+            .container {
+                padding: 28px 16px 0;
+                gap: 28px;
+            }
+
+            .book-image img {
+                max-width: 210px;
+                border-radius: 16px;
+                box-shadow: 0 20px 36px rgba(0, 0, 0, 0.45);
+            }
+
+            .book-content h1 {
+                font-size: 2rem;
+            }
+
+            .author {
+                font-size: 1.05rem;
+                margin-bottom: 20px;
+            }
+
+            .meta {
+                gap: 16px;
+                margin-bottom: 22px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .rating {
+                font-size: 1.5rem;
+            }
+
+            .buttons {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+                padding: 14px 22px;
+                font-size: 1rem;
+            }
+
+            .borrow-panel {
+                padding: 18px;
+            }
+
+            .borrow-option {
+                grid-template-columns: auto 1fr;
+                row-gap: 6px;
+            }
+
+            .borrow-cost {
+                grid-column: 2 / -1;
+                text-align: left;
+            }
+
+            .genres {
+                margin-bottom: 26px;
+            }
+
+            .rate {
+                margin-bottom: 28px;
+            }
+
+            .rate .rating-star {
+                font-size: 1.8rem;
+            }
+
+            .desc {
+                padding: 20px;
+                border-radius: 18px;
+                font-size: 0.98rem;
+                margin-bottom: 32px;
+            }
+
+            .comment-box {
+                padding: 18px;
+                border-radius: 16px;
+            }
+
+            .comment-box h3 {
+                font-size: 1.15rem;
+            }
+
+            .comment-box textarea {
+                height: 96px;
+                font-size: 0.95rem;
+            }
+
+            .comment-actions {
+                gap: 10px;
+            }
+
+            .post-btn,
+            .preview-btn {
+                width: 100%;
+                justify-content: center;
+                font-size: 0.95rem;
+            }
+
+            .recommendations-section {
+                padding: 0 16px;
+            }
+
+            .section-title {
+                font-size: 1.2rem;
+                gap: 8px;
+                justify-content: center;
+                text-align: center;
+            }
+
+            .horizontal-scroll {
+                padding-bottom: 8px;
+            }
+
+            .horizontal-row {
+                gap: 14px;
+            }
+
+            .book-card {
+                width: 150px;
+                flex: 0 0 150px;
+                border-radius: 16px;
+            }
+
+            .book-cover {
+                height: 170px;
+            }
+
+            .book-info {
+                padding: 12px 12px 36px;
+            }
+
+            .book-title {
+                font-size: 0.92rem;
+            }
+
+            .book-author {
+                font-size: 0.78rem;
+            }
+
+            .book-access-label {
+                left: 12px;
+                bottom: 10px;
+                font-size: 0.7rem;
+                padding: 3px 8px;
+            }
+
+            .modal-content {
+                width: min(92vw, 520px);
+                border-radius: 18px;
+            }
+
+            .modal-header h2 {
+                font-size: 1.2rem;
+            }
+
+            .modal-body {
+                padding: 18px;
+                max-height: 420px;
+            }
+        }
 /* ==================== FACEBOOK-STYLE COMMENTS ==================== */
 
 .fb-comment {
