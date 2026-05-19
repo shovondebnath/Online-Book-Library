@@ -38,11 +38,11 @@
                             <div class="form-grid">
                                 <div class="form-group">
                                     <label for="name">Name</label>
-                                    <input type="text" id="name" name="name" placeholder="Your full name" autocomplete="off" required>
+                                    <input type="text" id="name" name="name" placeholder="Your full name" autocomplete="off" value="{% if request.user.is_authenticated %}{{ request.user.first_name }} {{ request.user.last_name }}{% endif %}" required>
                                 </div>
                                 <div class="form-group">
                                     <label for="email">Email</label>
-                                    <input type="email" id="email" name="email" placeholder="you@example.com" autocomplete="off" required>
+                                    <input type="email" id="email" name="email" placeholder="you@example.com" autocomplete="off" value="{% if request.user.is_authenticated %}{{ request.user.email }}{% endif %}" required>
                                 </div>
                                 <div class="form-group">
                                     <label for="topic">Topic</label>
@@ -63,7 +63,7 @@
                                 <label for="message">How can we help you?</label>
                                 <textarea id="message" name="message" placeholder="Share the details so we can help faster." required></textarea>
                             </div>
-                            <button onclick="submitTicket()" class="submit-btn" type="button">
+                            <button class="submit-btn" type="submit">
                                 Submit support ticket
                             </button>
                             <p class="form-hint">

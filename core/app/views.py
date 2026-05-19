@@ -1,9 +1,13 @@
+import logging
+
 from django.conf import settings
 from django.contrib import messages
-from django.core.mail import send_mail
+from django.core.mail import EmailMessage
 from django.shortcuts import redirect, render
 
 # Create your views here.
+
+logger = logging.getLogger(__name__)
 
 def support_view(request):
     if request.method == 'POST':
@@ -37,16 +41,17 @@ def support_view(request):
         lines.append(message)
 
         try:
-            send_mail(
+            EmailMessage(
                 subject=subject,
-                message='\n'.join(lines),
+                body='\n'.join(lines),
                 from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=[settings.EMAIL_HOST_USER],
+                to=[settings.EMAIL_HOST_USER],
                 reply_to=[email],
-            )
+            ).send()
             messages.success(request, 'Your support ticket was sent. We will reply soon.')
             return redirect('support_view')
         except Exception:
+            logger.exception('Support email send failed')
             messages.error(request, 'We could not send your ticket right now. Please try again.')
             return render(request, 'support.html')
 
