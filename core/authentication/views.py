@@ -9,6 +9,7 @@ from django.contrib.auth import login as auth_login, logout as auth_logout
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import User
 from django.core.mail import send_mail
+from django.db.models import Q
 from django.http import JsonResponse
 from django.shortcuts import redirect, render
 from django.views.decorators.http import require_POST
@@ -59,6 +60,12 @@ def _is_otp_expired(created_at):
     return (time.time() - created_at) > OTP_EXPIRY_SECONDS
 
 
+def _email_in_use(email):
+    return User.objects.filter(
+        Q(email__iexact=email) | Q(username__iexact=email)
+    ).exists()
+
+
 def _get_pending_registration(request):
     pending = request.session.get(OTP_SESSION_KEY)
     if not isinstance(pending, dict):
@@ -89,7 +96,7 @@ def check_email_view(request):
             'message': 'Please enter a valid email address.',
         })
 
-    if User.objects.filter(email=email).exists():
+    if _email_in_use(email):
         return JsonResponse({
             'valid': True,
             'exists': True,
@@ -117,7 +124,7 @@ def check_login_email_view(request):
             'message': 'Please enter a valid email address.',
         })
 
-    email_exists = User.objects.filter(email=email).exists()
+    email_exists = _email_in_use(email)
     if not email_exists:
         return JsonResponse({
             'valid': True,
@@ -197,7 +204,7 @@ def otp_verify_view(request):
                 messages.error(request, 'Invalid OTP. Please try again.')
                 return render(request, 'otp_verify.html', {'form': form, 'email': email})
 
-            if User.objects.filter(email=email).exists():
+            if _email_in_use(email):
                 request.session.pop(OTP_SESSION_KEY, None)
                 request.session.pop('otp_email', None)
                 messages.error(
@@ -284,7 +291,9 @@ def auth_login_view(request):
             errors['password'] = 'Password is required.'
 
         if not errors:
-            user = User.objects.filter(email=email).first()
+            user = User.objects.filter(
+                Q(email__iexact=email) | Q(username__iexact=email)
+            ).first()
 
             if user is None or not user.check_password(password):
                 errors['password'] = 'Incorrect email or password.'

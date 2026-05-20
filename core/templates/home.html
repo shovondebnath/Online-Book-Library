@@ -69,7 +69,15 @@
                         <p class="book-title">{{ book.title }}</p>
                         <p class="book-author">{{ book.author }}</p>
                     </div>
-                    <p class="book-access-label {% if book.book_paid %}book-access-paid{% else %}book-access-free{% endif %}">{{ book.book_paid|yesno:"Paid,Free" }}</p>
+                    {% if book.book_paid %}
+                        {% if book.book_id in active_borrow_book_ids %}
+                            <p class="book-access-label book-access-borrowed">Borrowed</p>
+                        {% else %}
+                            <p class="book-access-label book-access-paid">Paid</p>
+                        {% endif %}
+                    {% else %}
+                        <p class="book-access-label book-access-free">Free</p>
+                    {% endif %}
                 </a>
             {% empty %}
                 <p class="footer-note">No books are available yet.</p>
@@ -92,7 +100,15 @@
                         <p class="book-title">{{ book.title }}</p>
                         <p class="book-author">{{ book.author }}</p>
                     </div>
-                    <p class="book-access-label {% if book.book_paid %}book-access-paid{% else %}book-access-free{% endif %}">{{ book.book_paid|yesno:"Paid,Free" }}</p>
+                    {% if book.book_paid %}
+                        {% if book.book_id in active_borrow_book_ids %}
+                            <p class="book-access-label book-access-borrowed">Borrowed</p>
+                        {% else %}
+                            <p class="book-access-label book-access-paid">Paid</p>
+                        {% endif %}
+                    {% else %}
+                        <p class="book-access-label book-access-free">Free</p>
+                    {% endif %}
                 </a>
             {% empty %}
                 <p class="footer-note">No books found in the library yet.</p>

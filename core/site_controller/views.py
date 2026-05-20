@@ -683,6 +683,21 @@ def home_view(request):
 	books = Book.objects.select_related('category').order_by('?')
 
 	categories = Category.objects.order_by('name').distinct()
+	active_borrow_book_ids = []
+	if request.user.is_authenticated:
+		now = timezone.now()
+		Borrow.objects.filter(
+			user=request.user,
+			is_active=True,
+			expiry_date__lte=now,
+		).update(is_active=False)
+		active_borrow_book_ids = list(
+			Borrow.objects.filter(
+				user=request.user,
+				is_active=True,
+				expiry_date__gt=now,
+			).values_list('book_id', flat=True)
+		)
 
 	return render(
 		request,
@@ -691,6 +706,7 @@ def home_view(request):
 			'books': books,
 			'last_updated_books': last_updated_books,
 			'categories': categories,
+			'active_borrow_book_ids': active_borrow_book_ids,
 		},
 	)
 

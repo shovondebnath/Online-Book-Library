@@ -77,11 +77,11 @@
                                 id="my-books-trigger"
                                 data-list-url="{% url 'my_books_list' %}"
                                 style="color: #122126; background-color: rgb(201, 242, 217);">
-                                My Book
+                                My Books
                             </a>
                             <button type="button" class="profile-item profile-action" data-profile-action="transactions">Transaction</button>
                             {% if not request.user.is_staff %}
-                                <button type="button" class="profile-item profile-action" data-profile-action="credit">Credit</button>
+                                <button type="button" class="profile-item profile-action" data-profile-action="credit">Buy Credit</button>
                             {% endif %}
                             <a href="{% url 'logout_view' %}" class="profile-item profile-logout " style="color: #8b1f1f;">Logout</a>
                             <p class="profile-note" id="profile-note" aria-live="polite"></p>

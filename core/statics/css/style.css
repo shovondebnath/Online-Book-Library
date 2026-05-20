@@ -981,6 +981,11 @@
             color: #ffffff;
         }
 
+        .book-access-borrowed {
+            background-color: #2F6AA3;
+            color: #ffffff;
+        }
+
         .book-access-free {
             background-color: #29A33D;
             color: #ffffff;
