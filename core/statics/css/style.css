@@ -32,6 +32,15 @@
             top: 0;
             z-index: 1000;
         }
+
+        .nav-credit {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            font-weight: 600;
+            color: #ffffff;
+            white-space: nowrap;
+        }
         
         .logo {
             font-family: 'Bukhari Script', cursive;

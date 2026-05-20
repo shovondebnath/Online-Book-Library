@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django.contrib.auth.models import User
 from django.db import models
 
@@ -11,7 +13,7 @@ from .storage_backends import book_file_storage, cover_image_storage
 # -------------------------
 class CreditWallet(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    balance = models.DecimalField(max_digits=10, decimal_places=2)
+    balance = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('500.00'))
     last_updated = models.DateTimeField(auto_now=True)
 
     def __str__(self):

@@ -16,6 +16,10 @@
         <!-- Logo -->
         <div class="pacifico-regular" style="font-size: 22px; margin: 0; padding: 0; border: 0">DigiShelf</div>
 
+        {% if request.user.is_authenticated and not request.user.is_staff %}
+            <div class="nav-credit">Credits: {{ request.user.creditwallet.balance }} / 500</div>
+        {% endif %}
+
         <!-- Menu -->
         <div class="nav-menu">
             <div class="nav-links">
@@ -76,7 +80,9 @@
                                 My Book
                             </a>
                             <button type="button" class="profile-item profile-action" data-profile-action="transactions">Transaction</button>
-                            <button type="button" class="profile-item profile-action" data-profile-action="credit">Credit</button>
+                            {% if not request.user.is_staff %}
+                                <button type="button" class="profile-item profile-action" data-profile-action="credit">Credit</button>
+                            {% endif %}
                             <a href="{% url 'logout_view' %}" class="profile-item profile-logout " style="color: #8b1f1f;">Logout</a>
                             <p class="profile-note" id="profile-note" aria-live="polite"></p>
                         </div>

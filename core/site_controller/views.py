@@ -97,6 +97,15 @@ def _borrow_options(book):
 	return options
 
 
+def _get_or_create_wallet(user):
+	if not user or not user.is_authenticated or user.is_staff:
+		return None
+	wallet = CreditWallet.objects.select_for_update().filter(user=user).first()
+	if wallet:
+		return wallet
+	return CreditWallet.objects.create(user=user)
+
+
 def _get_active_borrow(user, book):
 	if not user or not user.is_authenticated:
 		return None
@@ -516,15 +525,16 @@ def borrow_book_view(request, book_id):
 		return redirect(reverse('openbook_detail', args=[book.book_id]))
 
 	with transaction.atomic():
-		wallet = CreditWallet.objects.select_for_update().filter(user=request.user).first()
+		wallet = _get_or_create_wallet(request.user)
 		if not wallet:
 			messages.error(request, 'You need a credit wallet to borrow books.')
 			return redirect(reverse('openbook_detail', args=[book.book_id]))
-		if wallet.balance < cost:
+		current_balance = Decimal(str(wallet.balance))
+		if current_balance < cost:
 			messages.error(request, 'You do not have enough credits to borrow this book.')
 			return redirect(reverse('openbook_detail', args=[book.book_id]))
 
-		wallet.balance = wallet.balance - cost
+		wallet.balance = current_balance - cost
 		wallet.save(update_fields=['balance', 'last_updated'])
 
 		borrow_date = timezone.now()

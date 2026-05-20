@@ -1,6 +1,7 @@
 import random
 import re
 import time
+from decimal import Decimal
 
 from django.conf import settings
 from django.contrib import messages
@@ -12,6 +13,7 @@ from django.http import JsonResponse
 from django.shortcuts import redirect, render
 from django.views.decorators.http import require_POST
 
+from app.models import CreditWallet
 from .forms import OTPVerificationForm, RegistrationForm
 
 
@@ -22,6 +24,16 @@ EMAIL_REGEX = re.compile(r'^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$')
 
 def generate_otp():
     return str(random.randint(100000, 999999))
+
+
+def _ensure_credit_wallet(user):
+    if not user or user.is_staff:
+        return None
+    wallet, _ = CreditWallet.objects.get_or_create(
+        user=user,
+        defaults={'balance': Decimal('500.00')},
+    )
+    return wallet
 
 
 
@@ -208,6 +220,8 @@ def otp_verify_view(request):
                 is_superuser=False,
             )
 
+            _ensure_credit_wallet(user)
+
             request.session.pop(OTP_SESSION_KEY, None)
             request.session.pop('otp_email', None)
 
@@ -278,6 +292,7 @@ def auth_login_view(request):
                 errors['password'] = 'This account has been disabled.'
             else:
                 auth_login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+                _ensure_credit_wallet(user)
                 next_url = request.POST.get('next') or request.GET.get('next') or 'home_view'
                 return redirect(next_url)
 
